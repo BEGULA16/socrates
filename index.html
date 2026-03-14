@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>vxl.bot.nu | Server Status</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        amoled: '#000000',
+                        card: '#0a0a0a',
+                        border: '#1f1f1f',
+                        accent: '#22c55e', 
+                        danger: '#ef4444' 
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+  
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #000000; }
+        ::-webkit-scrollbar-thumb { background: #1f1f1f; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #333333; }
+        
+        .toast-enter { animation: slideUp 0.3s ease-out forwards; }
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+    
+        .tab-content { display: none; opacity: 0; transition: opacity 0.3s ease; }
+        .tab-content.active { display: block; opacity: 1; }
+        
+   
+        #bg-glow {
+            background: radial-gradient(circle at top, rgba(255,255,255,0.05) 0%, #000000 60%);
+        }
+        body.theme-online #bg-glow { background: radial-gradient(circle at top, rgba(34, 197, 94, 0.15) 0%, #000000 70%); }
+        body.theme-offline #bg-glow { background: radial-gradient(circle at top, rgba(239, 68, 68, 0.15) 0%, #000000 70%); }
+        
+        .status-glow { transition: box-shadow 1s ease, border-color 1s ease; }
+        body.theme-online .status-glow { box-shadow: 0 -10px 40px -10px rgba(34, 197, 94, 0.1); border-color: rgba(34, 197, 94, 0.2); }
+        body.theme-offline .status-glow { box-shadow: 0 -10px 40px -10px rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2); }
+    </style>
+</head>
+<body class="bg-amoled text-white font-sans antialiased min-h-screen flex flex-col transition-colors duration-1000">
+
+  
+    <div id="bg-glow" class="fixed inset-0 z-0 pointer-events-none transition-all duration-1000"></div>
+
+
+    <header class="border-b border-border bg-card/50 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="relative flex h-3 w-3">
+                  <span id="status-ping-bg" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
+                  <span id="status-ping-dot" class="relative inline-flex rounded-full h-3 w-3 bg-accent"></span>
+                </div>
+                <h1 class="text-xl font-bold tracking-tight">vxl.bot.nu</h1>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="switchTab('live')" id="tab-btn-live" class="px-4 py-2 text-sm font-medium rounded-md bg-white/10 text-white transition-colors">Live Status</button>
+                <button onclick="switchTab('uptime')" id="tab-btn-uptime" class="px-4 py-2 text-sm font-medium rounded-md text-gray-400 hover:text-white hover:bg-white/5 transition-colors">Uptime</button>
+            </div>
+        </div>
+    </header>
+
+
+    <main class="flex-grow max-w-4xl mx-auto w-full px-4 py-8 relative z-10">
+        
+   
+        <div id="tab-live" class="tab-content active space-y-6">
+            
+      
+            <div id="overview-card" class="bg-card border border-border rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-2xl status-glow">
+                <div class="flex flex-col items-center sm:items-start text-center sm:text-left">
+                    <h2 class="text-gray-400 text-sm font-semibold tracking-widest uppercase mb-1">Current Players</h2>
+                    <div class="flex items-baseline gap-2">
+                        <span id="player-count" class="text-6xl sm:text-7xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-white to-gray-500">0</span>
+                        <span class="text-2xl text-gray-500 font-medium">/ <span id="max-players">0</span></span>
+                    </div>
+                    <p id="motd" class="mt-4 text-gray-400 text-sm max-w-sm italic">Pinging server...</p>
+                </div>
+
+                <div class="flex flex-col gap-3 w-full sm:w-auto">
+                
+                    <button onclick="copyToClipboard('vxl.bot.nu', 'IP')" class="group relative flex items-center justify-between gap-4 bg-black border border-border rounded-xl p-4 hover:border-gray-600 transition-all cursor-pointer">
+                        <div class="flex items-center gap-3 text-left">
+                            <i data-lucide="globe" class="text-gray-400 group-hover:text-white transition-colors"></i>
+                            <div>
+                                <p class="text-xs text-gray-500 font-medium">Server IP (CNAME)</p>
+                                <p class="font-mono text-sm font-semibold">vxl.bot.nu</p>
+                            </div>
+                        </div>
+                        <i data-lucide="copy" class="w-4 h-4 text-gray-600 group-hover:text-white transition-colors"></i>
+                    </button>
+
+                
+                    <button onclick="copyToClipboard('25686', 'Port')" class="group relative flex items-center justify-between gap-4 bg-black border border-border rounded-xl p-4 hover:border-gray-600 transition-all cursor-pointer">
+                        <div class="flex items-center gap-3 text-left">
+                            <i data-lucide="network" class="text-gray-400 group-hover:text-white transition-colors"></i>
+                            <div>
+                                <p class="text-xs text-gray-500 font-medium">Bedrock Port</p>
+                                <p class="font-mono text-sm font-semibold">25686</p>
+                            </div>
+                        </div>
+                        <i data-lucide="copy" class="w-4 h-4 text-gray-600 group-hover:text-white transition-colors"></i>
+                    </button>
+                </div>
+            </div>
+
+          
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div class="bg-card border border-border rounded-xl p-5 flex flex-col justify-center items-center sm:items-start status-glow">
+                    <div class="flex items-center gap-2 text-gray-400 mb-2">
+                        <i data-lucide="activity" class="w-4 h-4"></i>
+                        <span class="text-xs font-semibold uppercase tracking-wider">Status</span>
+                    </div>
+                    <span id="server-status-text" class="text-lg font-bold text-accent">Online</span>
+                </div>
+                
+                <div class="bg-card border border-border rounded-xl p-5 flex flex-col justify-center items-center sm:items-start status-glow">
+                    <div class="flex items-center gap-2 text-gray-400 mb-2">
+                        <i data-lucide="timer" class="w-4 h-4"></i>
+                        <span class="text-xs font-semibold uppercase tracking-wider">Uptime</span>
+                    </div>
+                    <span id="live-uptime" class="text-lg font-bold text-white font-mono">00:00:00</span>
+                </div>
+
+                <div class="bg-card border border-border rounded-xl p-5 flex flex-col justify-center items-center sm:items-start status-glow">
+                    <div class="flex items-center gap-2 text-gray-400 mb-2">
+                        <i data-lucide="tag" class="w-4 h-4"></i>
+                        <span class="text-xs font-semibold uppercase tracking-wider">Version</span>
+                    </div>
+                    <span id="server-version" class="text-lg font-bold text-white">Loading...</span>
+                </div>
+
+                <div class="bg-card border border-border rounded-xl p-5 flex flex-col justify-center items-center sm:items-start status-glow">
+                    <div class="flex items-center gap-2 text-gray-400 mb-2">
+                        <i data-lucide="clock" class="w-4 h-4"></i>
+                        <span class="text-xs font-semibold uppercase tracking-wider">Updated</span>
+                    </div>
+                    <span id="last-updated" class="text-lg font-bold text-white">Just now</span>
+                </div>
+            </div>
+        </div>
+
+       
+        <div id="tab-uptime" class="tab-content space-y-6">
+            <div class="bg-card border border-border rounded-2xl p-6 shadow-2xl">
+                <div class="flex justify-between items-end mb-6">
+                    <div>
+                        <h2 class="text-xl font-bold">Uptime History</h2>
+                        <p class="text-sm text-gray-400">Past 24 hours (Simulated for Demo)</p>
+                    </div>
+                    <div class="text-right">
+                        <span id="overall-uptime-text" class="text-3xl font-black text-accent">100%</span>
+                    </div>
+                </div>
+                
+                <div class="h-64 w-full">
+                    <canvas id="uptimeChart"></canvas>
+                </div>
+            </div>
+
+           
+            <div class="bg-card border border-border rounded-2xl overflow-hidden shadow-2xl">
+                <div class="px-6 py-4 border-b border-border">
+                    <h3 class="font-bold">Recent Downtime Events</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-black/50 text-gray-400 text-sm">
+                                <th class="px-6 py-3 font-medium">Date & Time</th>
+                                <th class="px-6 py-3 font-medium">Duration</th>
+                                <th class="px-6 py-3 font-medium">Reason / Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="downtime-log" class="text-sm divide-y divide-border">
+                        
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    
+    <footer class="border-t border-border mt-auto py-6 text-center text-sm text-gray-500">
+        <p>Live tracking for vxl.bot.nu | Updates every 10s</p>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-white text-black px-6 py-3 rounded-full font-bold shadow-lg hidden z-50 flex items-center gap-2">
+        <i data-lucide="check-circle" class="w-5 h-5 text-green-500"></i>
+        <span id="toast-msg">Copied!</span>
+    </div>
+
+    <script>
+      
+        lucide.createIcons();
+
+       
+        const IP = "vxl.bot.nu";
+        const PORT = 25686;
+        const API_URL = `https://api.mcsrvstat.us/bedrock/3/${IP}:${PORT}`;
+        
+      
+        let currentPlayers = 0;
+        let chartInstance = null;
+        let uptimeInterval = null;
+        let sessionStartTime = null;
+
+      
+        function startUptimeTimer() {
+            if (!sessionStartTime) sessionStartTime = Date.now();
+            if (uptimeInterval) return;
+            
+            uptimeInterval = setInterval(() => {
+                const diff = Math.floor((Date.now() - sessionStartTime) / 1000);
+                const h = String(Math.floor(diff / 3600)).padStart(2, '0');
+                const m = String(Math.floor((diff % 3600) / 60)).padStart(2, '0');
+                const s = String(diff % 60).padStart(2, '0');
+                document.getElementById('live-uptime').innerText = `${h}:${m}:${s}`;
+            }, 1000);
+        }
+
+        function stopUptimeTimer() {
+            if (uptimeInterval) {
+                clearInterval(uptimeInterval);
+                uptimeInterval = null;
+            }
+            document.getElementById('live-uptime').innerText = "Offline";
+        }
+
+       
+        function animateValue(elementId, start, end, duration) {
+            const obj = document.getElementById(elementId);
+            if (!obj || start === end) return;
+            
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+               
+                const easeOut = 1 - (1 - progress) * (1 - progress); 
+                obj.innerHTML = Math.floor(easeOut * (end - start) + start);
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                } else {
+                    obj.innerHTML = end;
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+     
+        async function fetchServerStatus() {
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+                
+                const now = new Date().toLocaleTimeString();
+                document.getElementById('last-updated').innerText = now;
+
+                if (data.online) {
+                 
+                    animateValue("player-count", currentPlayers, data.players.online, 500);
+                    currentPlayers = data.players.online;
+                    
+                    document.getElementById("max-players").innerText = data.players.max;
+                    document.getElementById("server-version").innerText = data.version;
+                    
+                    if (data.motd && data.motd.clean) {
+                        document.getElementById("motd").innerText = data.motd.clean.join(" - ");
+                    }
+
+                    setOnlineUI(true);
+                    logUptime(true);
+                } else {
+                    setOnlineUI(false);
+                    document.getElementById("motd").innerText = "Server is currently offline.";
+                    animateValue("player-count", currentPlayers, 0, 500);
+                    currentPlayers = 0;
+                    logUptime(false);
+                }
+            } catch (error) {
+                console.error("Error fetching status:", error);
+                setOnlineUI(false);
+            }
+        }
+
+     
+        function setOnlineUI(isOnline) {
+            const pingBg = document.getElementById('status-ping-bg');
+            const pingDot = document.getElementById('status-ping-dot');
+            const statusText = document.getElementById('server-status-text');
+
+            if (isOnline) {
+                document.body.classList.remove('theme-offline');
+                document.body.classList.add('theme-online');
+                
+                pingBg.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75";
+                pingDot.className = "relative inline-flex rounded-full h-3 w-3 bg-accent";
+                statusText.innerText = "Online";
+                statusText.className = "text-lg font-bold text-accent";
+                
+                startUptimeTimer();
+            } else {
+                document.body.classList.remove('theme-online');
+                document.body.classList.add('theme-offline');
+                
+                pingBg.className = "hidden";
+                pingDot.className = "relative inline-flex rounded-full h-3 w-3 bg-danger";
+                statusText.innerText = "Offline";
+                statusText.className = "text-lg font-bold text-danger";
+                
+                stopUptimeTimer();
+            }
+        }
+
+  
+        function copyToClipboard(text, type) {
+            navigator.clipboard.writeText(text).then(() => {
+                const toast = document.getElementById('toast');
+                document.getElementById('toast-msg').innerText = `${type} Copied!`;
+                toast.classList.remove('hidden');
+                toast.classList.add('toast-enter');
+                
+                setTimeout(() => {
+                    toast.classList.add('hidden');
+                    toast.classList.remove('toast-enter');
+                }, 2000);
+            }).catch(err => {
+      
+                const textArea = document.createElement("textarea");
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    const toast = document.getElementById('toast');
+                    document.getElementById('toast-msg').innerText = `${type} Copied!`;
+                    toast.classList.remove('hidden');
+                    setTimeout(() => toast.classList.add('hidden'), 2000);
+                } catch (err) {
+                    console.error('Fallback copy failed', err);
+                }
+                document.body.removeChild(textArea);
+            });
+        }
+
+    
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.getElementById(`tab-${tabId}`).classList.add('active');
+            
+            const btnLive = document.getElementById('tab-btn-live');
+            const btnUptime = document.getElementById('tab-btn-uptime');
+            
+            if (tabId === 'live') {
+                btnLive.className = "px-4 py-2 text-sm font-medium rounded-md bg-white/10 text-white transition-colors";
+                btnUptime.className = "px-4 py-2 text-sm font-medium rounded-md text-gray-400 hover:text-white hover:bg-white/5 transition-colors";
+            } else {
+                btnUptime.className = "px-4 py-2 text-sm font-medium rounded-md bg-white/10 text-white transition-colors";
+                btnLive.className = "px-4 py-2 text-sm font-medium rounded-md text-gray-400 hover:text-white hover:bg-white/5 transition-colors";
+                
+                if(!chartInstance) loadUptimeData();
+            }
+        }
+
+      
+        async function loadUptimeData() {
+            try {
+     
+                const res = await fetch('uptime.json?t=' + Date.now());
+                if (!res.ok) throw new Error("No data found");
+                const history = await res.json();
+                
+                const labels = [];
+                const uptimeData = [];
+                const downtimes = [];
+                
+                const now = new Date();
+                
+             
+                for (let i = 23; i >= 0; i--) {
+                    const hourTime = new Date(now);
+                    hourTime.setHours(now.getHours() - i);
+                    labels.push(hourTime.getHours() + ":00");
+                    
+                    const pingsInHour = history.filter(p => {
+                        const d = new Date(p.timestamp);
+                        return d.getHours() === hourTime.getHours() && d.getDate() === hourTime.getDate();
+                    });
+                    
+                    if (pingsInHour.length === 0) {
+                        uptimeData.push(100);
+                    } else {
+                        const onlineCount = pingsInHour.filter(p => p.online).length;
+                        uptimeData.push(Math.round((onlineCount / pingsInHour.length) * 100));
+                    }
+                }
+                
+              
+                let currentDowntime = null;
+                history.forEach((ping) => {
+                    if (!ping.online && !currentDowntime) {
+                        currentDowntime = { start: ping.timestamp, end: null };
+                    } else if (ping.online && currentDowntime) {
+                        currentDowntime.end = ping.timestamp;
+                        downtimes.push(currentDowntime);
+                        currentDowntime = null;
+                    }
+                });
+                
+                if (currentDowntime) {
+                   currentDowntime.end = Date.now();
+                   downtimes.push(currentDowntime);
+                }
+
+                renderChart(labels, uptimeData);
+                renderDowntimeLogs(downtimes);
+                
+              
+                const totalOnline = history.filter(p => p.online).length;
+                const overallUptime = history.length > 0 ? ((totalOnline / history.length) * 100).toFixed(1) : 100;
+                const uptimeEl = document.getElementById('overall-uptime-text');
+                uptimeEl.innerText = overallUptime + '%';
+                uptimeEl.className = overallUptime > 90 ? "text-3xl font-black text-accent" : "text-3xl font-black text-danger";
+
+            } catch(e) {
+                console.log("No uptime history found yet. It will generate over time.");
+                const defaultLabels = Array.from({length: 24}, (_, i) => {
+                    const d = new Date(); d.setHours(d.getHours() - (23 - i));
+                    return d.getHours() + ":00";
+                });
+                renderChart(defaultLabels, Array(24).fill(100));
+            }
+        }
+
+        function renderChart(labels, data) {
+            const ctx = document.getElementById('uptimeChart').getContext('2d');
+            
+            chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Uptime %',
+                        data: data,
+                        backgroundColor: data.map(val => val > 90 ? '#22c55e' : (val > 50 ? '#eab308' : '#ef4444')),
+                        borderRadius: 4,
+                        borderSkipped: false,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { callbacks: { label: (context) => context.raw + '%' } }
+                    },
+                    scales: {
+                        y: { display: false, min: 0, max: 100 },
+                        x: { grid: { display: false, drawBorder: false }, ticks: { color: '#71717a', maxTicksLimit: 8 } }
+                    }
+                }
+            });
+        }
+
+        function renderDowntimeLogs(downtimes) {
+            const tbody = document.getElementById('downtime-log');
+            if (downtimes.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" class="px-6 py-4 text-center text-gray-500 italic">No recent downtime events tracked.</td></tr>`;
+                return;
+            }
+            
+            
+            tbody.innerHTML = downtimes.reverse().map(dt => {
+                const startDate = new Date(dt.start);
+                const durationMs = dt.end - dt.start;
+                const mins = Math.max(1, Math.round(durationMs / 60000));
+                
+                return `
+                <tr class="hover:bg-white/5 transition-colors">
+                    <td class="px-6 py-4 whitespace-nowrap text-gray-300">${startDate.toLocaleString()}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-gray-300">~${mins} min${mins !== 1 ? 's' : ''}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-red-500/10 text-red-500">
+                            <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Server Offline
+                        </span>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+       
+        function logUptime(isOnline) {
+        
+            console.log("Logged state:", isOnline ? "Online" : "Offline");
+        }
+
+     
+        fetchServerStatus();
+    
+        setInterval(fetchServerStatus, 10000);
+
+    </script>
+</body>
+</html>
