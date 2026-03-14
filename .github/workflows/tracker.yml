@@ -1,0 +1,31 @@
+name: High-Frequency Uptime Tracker
+
+on:
+  schedule:
+    - cron: '* * * * *' # Triggers every single minute
+  workflow_dispatch:
+
+# Prevents multiple runners from overlapping
+concurrency:
+  group: uptime-tracker
+  cancel-in-progress: false
+
+jobs:
+  track-uptime:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Required for pulling and pushing properly
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run High-Frequency Ping Loop
+        run: node ping.js
