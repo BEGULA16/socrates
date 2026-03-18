@@ -24,7 +24,6 @@
         }
     </script>
     <style>
-  
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #000000; }
         ::-webkit-scrollbar-thumb { background: #1f1f1f; border-radius: 4px; }
@@ -36,14 +35,10 @@
             to { transform: translateY(0); opacity: 1; }
         }
         
-    
         .tab-content { display: none; opacity: 0; transition: opacity 0.3s ease; }
         .tab-content.active { display: block; opacity: 1; }
         
-   
-        #bg-glow {
-            background: radial-gradient(circle at top, rgba(255,255,255,0.05) 0%, #000000 60%);
-        }
+        #bg-glow { background: radial-gradient(circle at top, rgba(255,255,255,0.05) 0%, #000000 60%); }
         body.theme-online #bg-glow { background: radial-gradient(circle at top, rgba(34, 197, 94, 0.15) 0%, #000000 70%); }
         body.theme-offline #bg-glow { background: radial-gradient(circle at top, rgba(239, 68, 68, 0.15) 0%, #000000 70%); }
         
@@ -54,9 +49,7 @@
 </head>
 <body class="bg-amoled text-white font-sans antialiased min-h-screen flex flex-col transition-colors duration-1000">
 
-  
     <div id="bg-glow" class="fixed inset-0 z-0 pointer-events-none transition-all duration-1000"></div>
-
 
     <header class="border-b border-border bg-card/50 backdrop-blur-md sticky top-0 z-50">
         <div class="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
@@ -74,13 +67,9 @@
         </div>
     </header>
 
-
     <main class="flex-grow max-w-4xl mx-auto w-full px-4 py-8 relative z-10">
         
-   
         <div id="tab-live" class="tab-content active space-y-6">
-            
-      
             <div id="overview-card" class="bg-card border border-border rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-2xl status-glow">
                 <div class="flex flex-col items-center sm:items-start text-center sm:text-left">
                     <h2 class="text-gray-400 text-sm font-semibold tracking-widest uppercase mb-1">Current Players</h2>
@@ -92,7 +81,6 @@
                 </div>
 
                 <div class="flex flex-col gap-3 w-full sm:w-auto">
-                
                     <button onclick="copyToClipboard('vxl.bot.nu', 'IP')" class="group relative flex items-center justify-between gap-4 bg-black border border-border rounded-xl p-4 hover:border-gray-600 transition-all cursor-pointer">
                         <div class="flex items-center gap-3 text-left">
                             <i data-lucide="globe" class="text-gray-400 group-hover:text-white transition-colors"></i>
@@ -104,7 +92,6 @@
                         <i data-lucide="copy" class="w-4 h-4 text-gray-600 group-hover:text-white transition-colors"></i>
                     </button>
 
-                
                     <button onclick="copyToClipboard('25686', 'Port')" class="group relative flex items-center justify-between gap-4 bg-black border border-border rounded-xl p-4 hover:border-gray-600 transition-all cursor-pointer">
                         <div class="flex items-center gap-3 text-left">
                             <i data-lucide="network" class="text-gray-400 group-hover:text-white transition-colors"></i>
@@ -118,7 +105,6 @@
                 </div>
             </div>
 
-          
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <div class="bg-card border border-border rounded-xl p-5 flex flex-col justify-center items-center sm:items-start status-glow">
                     <div class="flex items-center gap-2 text-gray-400 mb-2">
@@ -131,7 +117,7 @@
                 <div class="bg-card border border-border rounded-xl p-5 flex flex-col justify-center items-center sm:items-start status-glow">
                     <div class="flex items-center gap-2 text-gray-400 mb-2">
                         <i data-lucide="timer" class="w-4 h-4"></i>
-                        <span class="text-xs font-semibold uppercase tracking-wider">Uptime</span>
+                        <span class="text-xs font-semibold uppercase tracking-wider">Session</span>
                     </div>
                     <span id="live-uptime" class="text-lg font-bold text-white font-mono">00:00:00</span>
                 </div>
@@ -154,16 +140,15 @@
             </div>
         </div>
 
-       
         <div id="tab-uptime" class="tab-content space-y-6">
             <div class="bg-card border border-border rounded-2xl p-6 shadow-2xl">
                 <div class="flex justify-between items-end mb-6">
                     <div>
                         <h2 class="text-xl font-bold">Uptime History</h2>
-                        <p class="text-sm text-gray-400">Past 24 hours (Simulated for Demo)</p>
+                        <p id="uptime-subtitle" class="text-sm text-gray-400">Past 24 hours (Live Data)</p>
                     </div>
                     <div class="text-right">
-                        <span id="overall-uptime-text" class="text-3xl font-black text-accent">100%</span>
+                        <span id="overall-uptime-text" class="text-3xl font-black text-gray-500">--%</span>
                     </div>
                 </div>
                 
@@ -172,7 +157,6 @@
                 </div>
             </div>
 
-           
             <div class="bg-card border border-border rounded-2xl overflow-hidden shadow-2xl">
                 <div class="px-6 py-4 border-b border-border">
                     <h3 class="font-bold">Recent Downtime Events</h3>
@@ -187,7 +171,6 @@
                             </tr>
                         </thead>
                         <tbody id="downtime-log" class="text-sm divide-y divide-border">
-                        
                         </tbody>
                     </table>
                 </div>
@@ -196,35 +179,49 @@
 
     </main>
 
-    
     <footer class="border-t border-border mt-auto py-6 text-center text-sm text-gray-500">
         <p>Live tracking for vxl.bot.nu | Updates every 10s</p>
     </footer>
 
-    <!-- Toast Notification -->
     <div id="toast" class="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-white text-black px-6 py-3 rounded-full font-bold shadow-lg hidden z-50 flex items-center gap-2">
         <i data-lucide="check-circle" class="w-5 h-5 text-green-500"></i>
         <span id="toast-msg">Copied!</span>
     </div>
 
     <script>
-      
         lucide.createIcons();
 
-       
         const IP = "vxl.bot.nu";
         const PORT = 25686;
         const API_URL = `https://api.mcsrvstat.us/bedrock/3/${IP}:${PORT}`;
         
-      
         let currentPlayers = 0;
         let chartInstance = null;
         let uptimeInterval = null;
         let sessionStartTime = null;
+        let knownServerStartTime = null;
 
-      
+        // Fetch the real start time from GitHub database so it doesn't always start at 0
+        async function syncRealStartTime() {
+            try {
+                const res = await fetch('uptime.json?t=' + Date.now());
+                if (!res.ok) return;
+                const history = await res.json();
+                if (history && history.length > 0) {
+                    const lastRecord = history[history.length - 1];
+                    if (lastRecord.online) {
+                        knownServerStartTime = lastRecord.timestamp;
+                        // If local timer already started from 0, correct it instantly!
+                        if (sessionStartTime && (Date.now() - sessionStartTime < 60000)) {
+                            sessionStartTime = knownServerStartTime;
+                        }
+                    }
+                }
+            } catch (e) {}
+        }
+
         function startUptimeTimer() {
-            if (!sessionStartTime) sessionStartTime = Date.now();
+            if (!sessionStartTime) sessionStartTime = knownServerStartTime || Date.now();
             if (uptimeInterval) return;
             
             uptimeInterval = setInterval(() => {
@@ -244,7 +241,6 @@
             document.getElementById('live-uptime').innerText = "Offline";
         }
 
-       
         function animateValue(elementId, start, end, duration) {
             const obj = document.getElementById(elementId);
             if (!obj || start === end) return;
@@ -253,19 +249,17 @@
             const step = (timestamp) => {
                 if (!startTimestamp) startTimestamp = timestamp;
                 const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-               
                 const easeOut = 1 - (1 - progress) * (1 - progress); 
                 obj.innerHTML = Math.floor(easeOut * (end - start) + start);
                 if (progress < 1) {
                     window.requestAnimationFrame(step);
                 } else {
-                    obj.innerHTML = end;
+                    obj.innerHTML = end; 
                 }
             };
             window.requestAnimationFrame(step);
         }
 
-     
         async function fetchServerStatus() {
             try {
                 const response = await fetch(API_URL);
@@ -275,7 +269,6 @@
                 document.getElementById('last-updated').innerText = now;
 
                 if (data.online) {
-                 
                     animateValue("player-count", currentPlayers, data.players.online, 500);
                     currentPlayers = data.players.online;
                     
@@ -285,15 +278,12 @@
                     if (data.motd && data.motd.clean) {
                         document.getElementById("motd").innerText = data.motd.clean.join(" - ");
                     }
-
                     setOnlineUI(true);
-                    logUptime(true);
                 } else {
                     setOnlineUI(false);
                     document.getElementById("motd").innerText = "Server is currently offline.";
                     animateValue("player-count", currentPlayers, 0, 500);
                     currentPlayers = 0;
-                    logUptime(false);
                 }
             } catch (error) {
                 console.error("Error fetching status:", error);
@@ -301,7 +291,6 @@
             }
         }
 
-     
         function setOnlineUI(isOnline) {
             const pingBg = document.getElementById('status-ping-bg');
             const pingDot = document.getElementById('status-ping-dot');
@@ -321,7 +310,7 @@
                 document.body.classList.remove('theme-online');
                 document.body.classList.add('theme-offline');
                 
-                pingBg.className = "hidden";
+                pingBg.className = "hidden"; 
                 pingDot.className = "relative inline-flex rounded-full h-3 w-3 bg-danger";
                 statusText.innerText = "Offline";
                 statusText.className = "text-lg font-bold text-danger";
@@ -330,38 +319,21 @@
             }
         }
 
-  
         function copyToClipboard(text, type) {
             navigator.clipboard.writeText(text).then(() => {
                 const toast = document.getElementById('toast');
                 document.getElementById('toast-msg').innerText = `${type} Copied!`;
                 toast.classList.remove('hidden');
                 toast.classList.add('toast-enter');
-                
                 setTimeout(() => {
                     toast.classList.add('hidden');
                     toast.classList.remove('toast-enter');
                 }, 2000);
             }).catch(err => {
-      
-                const textArea = document.createElement("textarea");
-                textArea.value = text;
-                document.body.appendChild(textArea);
-                textArea.select();
-                try {
-                    document.execCommand('copy');
-                    const toast = document.getElementById('toast');
-                    document.getElementById('toast-msg').innerText = `${type} Copied!`;
-                    toast.classList.remove('hidden');
-                    setTimeout(() => toast.classList.add('hidden'), 2000);
-                } catch (err) {
-                    console.error('Fallback copy failed', err);
-                }
-                document.body.removeChild(textArea);
+                console.error('Copy failed', err);
             });
         }
 
-    
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.getElementById(`tab-${tabId}`).classList.add('active');
@@ -376,25 +348,26 @@
                 btnUptime.className = "px-4 py-2 text-sm font-medium rounded-md bg-white/10 text-white transition-colors";
                 btnLive.className = "px-4 py-2 text-sm font-medium rounded-md text-gray-400 hover:text-white hover:bg-white/5 transition-colors";
                 
-                if(!chartInstance) loadUptimeData();
+                loadUptimeData(); // Refresh chart data when tab is opened
             }
         }
 
-      
         async function loadUptimeData() {
             try {
-     
                 const res = await fetch('uptime.json?t=' + Date.now());
                 if (!res.ok) throw new Error("No data found");
                 const history = await res.json();
                 
+                if (!history || history.length === 0) throw new Error("Empty data");
+
+                document.getElementById('uptime-subtitle').innerText = "Past 24 hours (Live Data)";
+
                 const labels = [];
                 const uptimeData = [];
                 const downtimes = [];
-                
                 const now = new Date();
                 
-             
+                // Group data into the last 24 hours
                 for (let i = 23; i >= 0; i--) {
                     const hourTime = new Date(now);
                     hourTime.setHours(now.getHours() - i);
@@ -406,14 +379,13 @@
                     });
                     
                     if (pingsInHour.length === 0) {
-                        uptimeData.push(100);
+                        uptimeData.push(100); // Default to 100 if no data gathered yet for that specific old hour
                     } else {
                         const onlineCount = pingsInHour.filter(p => p.online).length;
                         uptimeData.push(Math.round((onlineCount / pingsInHour.length) * 100));
                     }
                 }
                 
-              
                 let currentDowntime = null;
                 history.forEach((ping) => {
                     if (!ping.online && !currentDowntime) {
@@ -433,7 +405,6 @@
                 renderChart(labels, uptimeData);
                 renderDowntimeLogs(downtimes);
                 
-              
                 const totalOnline = history.filter(p => p.online).length;
                 const overallUptime = history.length > 0 ? ((totalOnline / history.length) * 100).toFixed(1) : 100;
                 const uptimeEl = document.getElementById('overall-uptime-text');
@@ -442,17 +413,25 @@
 
             } catch(e) {
                 console.log("No uptime history found yet. It will generate over time.");
+                document.getElementById('uptime-subtitle').innerText = "Waiting for data (GitHub Action might not have run yet)";
+                document.getElementById('overall-uptime-text').innerText = "--%";
+                
                 const defaultLabels = Array.from({length: 24}, (_, i) => {
                     const d = new Date(); d.setHours(d.getHours() - (23 - i));
                     return d.getHours() + ":00";
                 });
-                renderChart(defaultLabels, Array(24).fill(100));
+                // RENDER GREY BARS IF NO DATA INSTEAD OF FAKE GREEN
+                renderChart(defaultLabels, Array(24).fill(0), true);
             }
         }
 
-        function renderChart(labels, data) {
+        function renderChart(labels, data, isEmpty = false) {
             const ctx = document.getElementById('uptimeChart').getContext('2d');
             
+            if (chartInstance) {
+                chartInstance.destroy(); // Destroy old chart before drawing new one
+            }
+
             chartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
@@ -460,7 +439,7 @@
                     datasets: [{
                         label: 'Uptime %',
                         data: data,
-                        backgroundColor: data.map(val => val > 90 ? '#22c55e' : (val > 50 ? '#eab308' : '#ef4444')),
+                        backgroundColor: data.map(val => isEmpty ? '#333333' : (val > 90 ? '#22c55e' : (val > 50 ? '#eab308' : '#ef4444'))),
                         borderRadius: 4,
                         borderSkipped: false,
                     }]
@@ -470,7 +449,11 @@
                     maintainAspectRatio: false,
                     plugins: {
                         legend: { display: false },
-                        tooltip: { callbacks: { label: (context) => context.raw + '%' } }
+                        tooltip: { 
+                            callbacks: { 
+                                label: (context) => isEmpty ? 'Waiting for data...' : context.raw + '%' 
+                            } 
+                        }
                     },
                     scales: {
                         y: { display: false, min: 0, max: 100 },
@@ -486,7 +469,6 @@
                 tbody.innerHTML = `<tr><td colspan="3" class="px-6 py-4 text-center text-gray-500 italic">No recent downtime events tracked.</td></tr>`;
                 return;
             }
-            
             
             tbody.innerHTML = downtimes.reverse().map(dt => {
                 const startDate = new Date(dt.start);
@@ -506,15 +488,8 @@
             }).join('');
         }
 
-       
-        function logUptime(isOnline) {
-        
-            console.log("Logged state:", isOnline ? "Online" : "Offline");
-        }
-
-     
+        syncRealStartTime();
         fetchServerStatus();
-    
         setInterval(fetchServerStatus, 10000);
 
     </script>
